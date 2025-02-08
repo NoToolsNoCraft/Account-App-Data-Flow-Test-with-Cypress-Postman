@@ -1,0 +1,36 @@
+name: Cypress and Postman Test Workflow
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install Cypress dependencies
+      run: npm ci
+
+    - name: Run Initial Cypress Test
+      run: npx cypress run --spec "cypress/e2e/InitialRun.cy.js"
+
+    - name: Install Newman (Postman CLI)
+      run: npm install -g newman
+
+    - name: Run Postman Test 1
+      run: newman run "Postman/Login app test.postman_collection.json"
+
+    - name: Run Second Cypress Test
+      run: npx cypress run --spec "cypress/e2e/VerifyPostmanChanges.cy.js"
+
+    - name: Run Postman Test 2
+      run: newman run "Postman/Login app test 2.postman_collection.json"
