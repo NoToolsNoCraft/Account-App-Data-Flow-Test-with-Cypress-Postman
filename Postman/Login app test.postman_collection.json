@@ -1,0 +1,204 @@
+{
+	"info": {
+		"_postman_id": "1dafedec-5334-4463-b72e-9f2229e9f5ee",
+		"name": "Login app test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35095642"
+	},
+	"item": [
+		{
+			"name": "Return all items and find the new one",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body as JSON\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"// Expected new user details\r",
+							"const expectedUsername = \"CypressUsername\";\r",
+							"const expectedPassword = \"CypressPassword\";\r",
+							"\r",
+							"// Validate status code\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is an array\r",
+							"pm.test(\"Response is an array and not empty\", function () {\r",
+							"    pm.expect(response).to.be.an(\"array\");\r",
+							"    pm.expect(response.length).to.be.above(0);\r",
+							"});\r",
+							"\r",
+							"// Verify that the new account is present\r",
+							"pm.test(\"Newly created user is found in the list\", function () {\r",
+							"    const user = response.find(user => user.name === expectedUsername && user.password === expectedPassword);\r",
+							"    pm.expect(user, \"User with expected credentials found\").to.not.be.undefined;\r",
+							"    pm.expect(user).to.have.property(\"_id\");\r",
+							"    pm.expect(user).to.have.property(\"__v\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://account-manager-app-express-mong-production.up.railway.app/api/users",
+					"protocol": "https",
+					"host": [
+						"account-manager-app-express-mong-production",
+						"up",
+						"railway",
+						"app"
+					],
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve Cypress created user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"// Expected values\r",
+							"const expectedUsername = \"CypressUsername\";\r",
+							"const expectedPassword = \"CypressPassword\";\r",
+							"\r",
+							"// Validate status code\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Check that the response has all the required fields\r",
+							"pm.test(\"Response has correct fields\", function () {\r",
+							"    pm.expect(response).to.have.property(\"_id\");\r",
+							"    pm.expect(response).to.have.property(\"name\");\r",
+							"    pm.expect(response).to.have.property(\"password\");\r",
+							"    pm.expect(response).to.have.property(\"__v\");\r",
+							"});\r",
+							"\r",
+							"// Validate the username and password\r",
+							"pm.test(\"Username and password are correct\", function () {\r",
+							"    pm.expect(response.name).to.eql(expectedUsername);\r",
+							"    pm.expect(response.password).to.eql(expectedPassword);\r",
+							"});\r",
+							"\r",
+							"// Check that the version number is 0\r",
+							"pm.test(\"Version number is correct\", function () {\r",
+							"    pm.expect(response.__v).to.eql(0);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://account-manager-app-express-mong-production.up.railway.app/api/users/CypressUsername",
+					"protocol": "https",
+					"host": [
+						"account-manager-app-express-mong-production",
+						"up",
+						"railway",
+						"app"
+					],
+					"path": [
+						"api",
+						"users",
+						"CypressUsername"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change the item password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body should contain success message\", function () {\r",
+							"    pm.expect(pm.response.text()).to.eql(\"Password updated successfully.\");\r",
+							"});\r",
+							"\r",
+							"// Chain a GET request to verify the password update\r",
+							"pm.sendRequest({\r",
+							"    url: 'https://account-manager-app-express-mong-production.up.railway.app/api/users/CypressUsername',\r",
+							"    method: 'GET',\r",
+							"    header: {\r",
+							"        'Content-Type': 'application/json'\r",
+							"    }\r",
+							"}, function (err, response) {\r",
+							"    pm.test(\"Verify the updated password\", function () {\r",
+							"        if (err) {\r",
+							"            console.log(\"Request error: \", err);\r",
+							"        } else {\r",
+							"            const jsonData = response.json();\r",
+							"            pm.expect(jsonData.password).to.eql(\"PasswordChanged\");\r",
+							"        }\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"newPassword\": \"PasswordChanged\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://account-manager-app-express-mong-production.up.railway.app/api/users/CypressUsername/password",
+					"protocol": "https",
+					"host": [
+						"account-manager-app-express-mong-production",
+						"up",
+						"railway",
+						"app"
+					],
+					"path": [
+						"api",
+						"users",
+						"CypressUsername",
+						"password"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

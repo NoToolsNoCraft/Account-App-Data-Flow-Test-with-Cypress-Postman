@@ -1,0 +1,93 @@
+{
+	"info": {
+		"_postman_id": "2b91b0b1-8519-48bf-a4f4-7830021d3d97",
+		"name": "Login app test 2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35095642"
+	},
+	"item": [
+		{
+			"name": "Check if the account is no more in the database",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify deleted account is no longer in the database\", function () {\r",
+							"    pm.response.to.have.status(200);  // Ensure the response status is 200\r",
+							"    const responseJson = pm.response.json();\r",
+							"    \r",
+							"    // Check that the account is no longer in the response\r",
+							"    const deletedAccount = responseJson.find(item => item.name === 'CypressUsername');\r",
+							"    \r",
+							"    // Assert that the deleted account is not present in the list\r",
+							"    pm.expect(deletedAccount).to.be.undefined;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://account-manager-app-express-mong-production.up.railway.app/api/users",
+					"protocol": "https",
+					"host": [
+						"account-manager-app-express-mong-production",
+						"up",
+						"railway",
+						"app"
+					],
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve previously removed account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify deleted account returns 404 User not found\", function () {\r",
+							"    pm.response.to.have.status(404);  // Ensure the status code is 404\r",
+							"    pm.response.to.have.body(\"User not found.\");  // Ensure the body contains \"User not found\"\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://account-manager-app-express-mong-production.up.railway.app/api/users/CypressUsername",
+					"protocol": "https",
+					"host": [
+						"account-manager-app-express-mong-production",
+						"up",
+						"railway",
+						"app"
+					],
+					"path": [
+						"api",
+						"users",
+						"CypressUsername"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
